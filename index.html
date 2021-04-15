@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <input id="bas" type="number" value="15" min="15" max="200" />
+        <input id="droite" type="number" value="20" min="20" max="200" />
+
+        <div id="circle" style="width: 300px; height: 1200px"></div>
+    </body>
+
+    <script src="https://cdn.jsdelivr.net/npm/makerjs@0/target/js/browser.maker.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bezier-js@2/bezier.js"></script>
+
+    <script>
+        var makerjs = require("makerjs");
+
+        const bas = document.querySelector("#bas");
+        const droite = document.querySelector("#droite");
+
+        var drawing = {
+            models: {
+                dome: new makerjs.models.Dome(120, 120),
+            },
+        };
+
+        var drawing = makerjs.importer.fromSVGPathData(
+            "M 0 30 L 30 30 L 30 15 A 15 15 0 0 0 15 0 A 15 15 0 0 0 0 15 L 0 30 Z"
+        );
+
+        bas.addEventListener("input", (e) => {
+
+            // Check min et max 
+            let value =
+                e.target.value === "" || e.target.value < 15
+                    ? 15
+                    : e.target.value;
+
+
+            // On fait les regalges 
+            drawing.paths.p_5.end[1] = -value;
+            drawing.paths.p_2.origin[1] = -value;
+
+            drawing.paths.p_1.origin[1] = 0 - value;
+            drawing.paths.p_1.end[1] = 0 - value;
+
+
+            // Ajouter à la vue 
+            document.querySelector(
+                "#circle"
+            ).innerHTML = makerjs.exporter.toSVG(drawing);
+        });
+
+        droite.addEventListener("input", (e) => {
+            let value =
+                e.target.value === "" || e.target.value < 20
+                    ? 20
+                    : parseInt(e.target.value);
+
+            drawing.paths.p_4 = new makerjs.paths.Arc(
+                [0, -15],
+                [value + 10, -15],
+                true
+            );
+
+            delete drawing.paths.p_3;
+
+            drawing.paths.p_2.end[0] = 10 + value;
+            drawing.paths.p_2.origin[0] = 10 + value;
+            drawing.paths.p_1.end[0] = 10 + value;
+
+            document.querySelector(
+                "#circle"
+            ).innerHTML = makerjs.exporter.toSVG(drawing);
+        });
+
+        document.querySelector("#circle").innerHTML = makerjs.exporter.toSVG(
+            drawing
+        );
+        console.log(drawing);
+    </script>
+</html>
